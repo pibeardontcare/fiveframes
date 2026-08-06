@@ -68,7 +68,9 @@ export default function JournalScreen({ navigation }) {
               <View key={entry.id} style={styles.entryRow}>
                 <Image source={{ uri: entry.photoUri }} style={styles.thumb} />
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.caption}>{entry.emoji} {entry.caption || ''}</Text>
+                  <Text style={styles.caption}>
+                    {entry.emoji} {entry.place ? `${entry.place} · ` : ''}{entry.caption}
+                    </Text>
                   <Text style={styles.time}>
                     {new Date(entry.timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
                   </Text>

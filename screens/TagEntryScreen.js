@@ -10,13 +10,16 @@ const MOODS = [
   { emoji: '😠', label: 'Stressed', value: 0 },
 ];
 
+
+
 export default function TagEntryScreen({ navigation, route }) {
-  const { photoUri } = route.params;
-  const [selectedMood, setSelectedMood] = useState(null);
-  const [caption, setCaption] = useState('');
+    const { photoUri, latitude, longitude, place } = route.params;
+    const [selectedMood, setSelectedMood] = useState(null);
+    const [caption, setCaption] = useState('');
 
   async function handleSave() {
-    if (!selectedMood) return; // require a mood before saving
+    if (!selectedMood) return; // must have mood to save
+
 
     await saveEntry({
       id: `entry-${Date.now()}`,
@@ -25,7 +28,11 @@ export default function TagEntryScreen({ navigation, route }) {
       emoji: selectedMood.emoji,
       caption: caption.trim(),
       timestamp: new Date().toISOString(),
+      latitude,
+      longitude,
+      place,
     });
+
 
     navigation.navigate('Capture');
   }
@@ -38,19 +45,20 @@ export default function TagEntryScreen({ navigation, route }) {
 
       <Image source={{ uri: photoUri }} style={styles.photo} resizeMode="cover" />
 
+       {place && <Text style={styles.place}>📍 {place}</Text>}
+
       <Text style={styles.prompt}>How does this moment feel?</Text>
 
       <View style={styles.moodRow}>
-        {MOODS.map((m) => (
-          <TouchableOpacity
-            key={m.label}
-            onPress={() => setSelectedMood(m)}
-            style={[styles.moodButton, selectedMood?.label === m.label && styles.moodSelected]}
-          >
-            <Text style={styles.moodEmoji}>{m.emoji}</Text>
-          </TouchableOpacity>
-        ))}
+            {MOODS.map((mood) => (
+            <TouchableOpacity key={mood.label} onPress={() => setSelectedMood(mood)} style={[styles.moodButton, selectedMood?.label === mood.label && styles.moodSelected]}>
+                <Text style={styles.moodEmoji}>{mood.emoji}</Text>
+            </TouchableOpacity>
+            ))}
       </View>
+
+
+ 
 
       <TextInput
         placeholder="Add a caption (optional)"
@@ -132,4 +140,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '500',
   },
+  place: {
+  fontSize: 13,
+  color: '#888',
+},
 });

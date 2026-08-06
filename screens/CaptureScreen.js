@@ -2,6 +2,11 @@ import { useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { CameraView, useCameraPermissions, capturePhoto } from '../services/camera';
 
+import { getCurrentCoords } from '../services/location';
+import { getPlaceName } from '../services/geocode';
+
+import { getSettings } from '../services/settings';
+
 export default function CaptureScreen({ navigation }) {
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef(null);
@@ -9,27 +14,21 @@ export default function CaptureScreen({ navigation }) {
 
 
 
-
-async function testGeocode() {
-  const url = new URL('https://api.bigdatacloud.net/data/reverse-geocode-client');
-  url.searchParams.set('latitude', '37.42159');
-  url.searchParams.set('longitude', '-122.0837');
-  url.searchParams.set('localityLanguage', 'en');
-
-  try {
-    const response = await fetch(url.toString());
-    console.log('status:', response.status);
-    const data = await response.json();
-    console.log(JSON.stringify(data, null, 2));
-  } catch (e) {
-    console.log('fetch error:', e);
-  }
-}
-
-
   async function handleShutter() {
-    const uri = await capturePhoto(cameraRef);
-    navigation.navigate('TagEntry', { photoUri: uri });
+    
+
+    const settings = await getSettings();
+    const uri = await capturePhoto(cameraRef, { saveToPhotos: settings.saveToPhotos });
+
+    const coords = await getCurrentCoords();
+    const place = coords ? await getPlaceName(coords.latitude, coords.longitude) : null;
+
+    navigation.navigate('TagEntry', {
+    photoUri: uri,
+    latitude: coords?.latitude ?? null,
+    longitude: coords?.longitude ?? null,
+    place,
+  });
   }
 
   if (!permission) return <View style={styles.container} />;
@@ -62,9 +61,7 @@ async function testGeocode() {
           <Text style={styles.icon}>📊</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={testGeocode}>
-        <Text style={styles.icon}>🌍</Text>
-        </TouchableOpacity>
+     
 
       </View>
     </View>
