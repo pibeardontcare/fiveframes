@@ -1,5 +1,8 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { useEffect } from 'react';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import * as Notifications from 'expo-notifications';
+
 
 import CaptureScreen from './screens/CaptureScreen';
 import TagEntryScreen from './screens/TagEntryScreen';
@@ -9,6 +12,7 @@ import InsightsScreen from './screens/InsightsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator();
+export const navigationRef = createNavigationContainerRef();
 
 export default function App() {
   return (

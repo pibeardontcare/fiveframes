@@ -3,9 +3,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const SETTINGS_KEY = 'fiveframes_settings';
 
 const DEFAULT_SETTINGS = {
-  saveToPhotos: false, //starts off by default
+  saveToPhotos: false,
+  promptTimes: [
+    { id: '1', hour: 8, minute: 30, enabled: true },
+    { id: '2', hour: 11, minute: 30, enabled: true },
+    { id: '3', hour: 14, minute: 0, enabled: true },
+    { id: '4', hour: 17, minute: 30, enabled: true },
+    { id: '5', hour: 21, minute: 0, enabled: true },
+  ],
 };
-
 export async function getSettings() {
   try {
     const json = await AsyncStorage.getItem(SETTINGS_KEY);
