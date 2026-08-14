@@ -11,12 +11,37 @@ import ReviewScreen from './screens/ReviewScreen';
 import InsightsScreen from './screens/InsightsScreen';
 import SettingsScreen from './screens/SettingsScreen';
 
+
+
 const Stack = createNativeStackNavigator();
+
 export const navigationRef = createNavigationContainerRef();
 
 export default function App() {
+  useEffect(() => {
+    const subscription =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        if (navigationRef.isReady()) {
+          navigationRef.resetRoot({
+            index: 0,
+            routes: [{ name: 'Capture' }],
+          });
+        }
+      });
+
+
+  // if closed and launched by notification tap 
+  Notifications.getLastNotificationResponseAsync().then((response) => {
+    if (response) {
+      handleNotificationResponse();
+    }
+  });
+
+    return () => subscription.remove();
+  }, []);
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         initialRouteName="Capture"
         screenOptions={{
@@ -27,10 +52,7 @@ export default function App() {
         <Stack.Screen name="Capture" component={CaptureScreen} />
         <Stack.Screen name="TagEntry" component={TagEntryScreen} />
         <Stack.Screen name="Journal" component={JournalScreen} />
-        <Stack.Screen
-          name="DayInReview"
-          component={ReviewScreen}
-        />
+        <Stack.Screen name="DayInReview" component={ReviewScreen} />
         <Stack.Screen name="Insights" component={InsightsScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>

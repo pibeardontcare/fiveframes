@@ -9,7 +9,7 @@ const DEFAULT_SETTINGS = {
     { id: '2', hour: 11, minute: 30, enabled: true },
     { id: '3', hour: 14, minute: 0, enabled: true },
     { id: '4', hour: 17, minute: 30, enabled: true },
-    { id: '5', hour: 21, minute: 0, enabled: true },
+    { id: '5', hour: 22, minute: 8, enabled: true },
   ],
 };
 export async function getSettings() {

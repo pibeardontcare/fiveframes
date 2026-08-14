@@ -1,22 +1,16 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { CameraView, useCameraPermissions, capturePhoto } from '../services/camera';
-
 import { getCurrentCoords } from '../services/location';
 import { getPlaceName } from '../services/geocode';
-
 import { getSettings } from '../services/settings';
+import { colors, spacing, radius, typography } from '../constants/theme';
 
 export default function CaptureScreen({ navigation }) {
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef(null);
 
-
-
-
   async function handleShutter() {
-    
-
     const settings = await getSettings();
     const uri = await capturePhoto(cameraRef, { saveToPhotos: settings.saveToPhotos });
 
@@ -24,20 +18,20 @@ export default function CaptureScreen({ navigation }) {
     const place = coords ? await getPlaceName(coords.latitude, coords.longitude) : null;
 
     navigation.navigate('TagEntry', {
-    photoUri: uri,
-    latitude: coords?.latitude ?? null,
-    longitude: coords?.longitude ?? null,
-    place,
-  });
+      photoUri: uri,
+      latitude: coords?.latitude ?? null,
+      longitude: coords?.longitude ?? null,
+      place,
+    });
   }
 
   if (!permission) return <View style={styles.container} />;
   if (!permission.granted) {
     return (
       <View style={styles.container}>
-        <Text>FiveFrames needs camera access to capture your moments.</Text>
+        <Text style={styles.permissionText}>FiveFrames needs camera access to capture your moments.</Text>
         <TouchableOpacity onPress={requestPermission}>
-          <Text style={{ color: 'blue' }}>Grant permission</Text>
+          <Text style={styles.link}>Grant permission</Text>
         </TouchableOpacity>
       </View>
     );
@@ -56,13 +50,14 @@ export default function CaptureScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.navigate('Journal')}>
           <Text style={styles.icon}>🖼</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.shutter} onPress={handleShutter} />
+
+        <View style={styles.shutterRing}>
+          <TouchableOpacity style={styles.shutter} onPress={handleShutter} />
+        </View>
+
         <TouchableOpacity onPress={() => navigation.navigate('Insights')}>
           <Text style={styles.icon}>📊</Text>
         </TouchableOpacity>
-
-     
-
       </View>
     </View>
   );
@@ -73,24 +68,35 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
-    padding: 20,
+    gap: spacing.md,
+    padding: spacing.lg,
+    backgroundColor: colors.background,
+  },
+  permissionText: {
+    fontSize: typography.body,
+    color: colors.textPrimary,
+    textAlign: 'center',
+  },
+  link: {
+    color: colors.spruce,
+    fontSize: typography.body,
   },
   topBar: {
     position: 'absolute',
     top: 50,
-    left: 20,
-    right: 20,
+    left: spacing.lg,
+    right: spacing.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   pill: {
-    color: '#fff',
+    color: colors.surface,
     backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingHorizontal: 10,
+    paddingHorizontal: spacing.sm,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: radius.full,
+    fontSize: typography.small,
   },
   bottomBar: {
     position: 'absolute',
@@ -98,20 +104,28 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-around', 
+    alignItems: 'center',
+  },
+  shutterRing: {
+    width: 84,
+    height: 84,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   shutter: {
     width: 64,
     height: 64,
-    borderRadius: 32,
-    backgroundColor: '#fff',
+    borderRadius: radius.full,
+    backgroundColor: colors.surface,
     borderWidth: 3,
-    borderColor: '#1E4A26',
+    borderColor: colors.spruce,
   },
   icon: {
-    fontSize: 22,
-    color: '#fff',
+    fontSize: typography.heading,
+    color: colors.surface,
   },
-
 });
